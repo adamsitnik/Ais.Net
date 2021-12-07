@@ -41,37 +41,10 @@ namespace Ais.Net.Benchmarks
         /// </remarks>
         private static void Main(string[] args)
         {
-            Job job = Job.Default;
             IConfig config = DefaultConfig.Instance
-                .With(MemoryDiagnoser.Default);
+                .AddDiagnoser(MemoryDiagnoser.Default);
 
-            if (args.Length == 1 && args[0] == "inprocess")
-            {
-                job = job
-                        .WithMinWarmupCount(2)
-                        .WithMaxWarmupCount(4)
-                        .With(InProcessEmitToolchain.Instance);
-                config = config.With(ConfigOptions.DisableOptimizationsValidator);
-            }
-            else
-            {
-                if (args.Length > 0)
-                {
-                    string artifactsPath = args[0];
-                    Directory.CreateDirectory(artifactsPath);
-                    config = config.WithArtifactsPath(artifactsPath);
-                }
-
-                if (args.Length > 1)
-                {
-                    string version = args[1];
-                    job = job.With(new Argument[] { new MsBuildArgument($"/p:Version={version}") });
-                }
-            }
-
-            config = config.With(job);
-
-            BenchmarkRunner.Run<AisNetBenchmarks>(config);
+            BenchmarkRunner.Run<AisNetBenchmarks>(config, args);
         }
     }
 }
